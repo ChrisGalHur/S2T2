@@ -68,7 +68,10 @@ SELECT producto.nombre, precio FROM producto INNER JOIN fabricante  ON producto.
 -- 31-Retorna un llistat amb el nom i el preu de tots els productes el nom de fabricant dels quals contingui el caràcter w en el seu nom.
 SELECT producto.nombre, precio FROM producto INNER JOIN fabricante  ON producto.codigo_fabricante = fabricante.codigo WHERE fabricante.nombre LIKE '%w%';
 -- 32-Retorna un llistat amb el nom de producte, preu i nom de fabricant, de tots els productes que tinguin un preu major o igual a 180 €. Ordena el resultat, en primer lloc, pel preu (en ordre descendent) i, en segon lloc, pel nom (en ordre ascendent).
-SELECT producto.nombre, precio, fabricante.nombre FROM producto INNER JOIN fabricante ON producto.codigo_fabricante = fabricante.codigo WHERE precio >= 180 ORDER BY precio DESC, producto.nombre ASC;
+SELECT producto.nombre, precio, fabricante.nombre FROM producto 
+INNER JOIN fabricante ON producto.codigo_fabricante = fabricante.codigo 
+WHERE precio >= 180 
+ORDER BY precio DESC, producto.nombre ASC;
 -- Retorna un llistat amb el codi i el nom de fabricant, solament d'aquells fabricants que tenen productes associats en la base de dades.
 SELECT DISTINCT fabricante.codigo, fabricante.nombre FROM fabricante INNER JOIN producto ON producto.codigo_fabricante = fabricante.codigo;
 -- Retorna un llistat de tots els fabricants que existeixen en la base de dades, juntament amb els productes que té cadascun d'ells. El llistat haurà de mostrar també aquells fabricants que no tenen productes associats.
@@ -112,13 +115,42 @@ SELECT persona.nombre, persona.apellido1, persona.apellido2 FROM persona WHERE p
 -- 5-Retorna el llistat de les assignatures que s'imparteixen en el primer quadrimestre, en el tercer curs del grau que té l'identificador 7.
 SELECT asignatura.nombre AS 'Asignaturas 3er quadrimestre' FROM universidad.asignatura WHERE asignatura.cuatrimestre = 1 AND asignatura.curso = 3 AND id_grado = 7;
 -- Retorna un llistat dels professors/es juntament amb el nom del departament al qual estan vinculats. El llistat ha de retornar quatre columnes, primer cognom, segon cognom, nom i nom del departament. El resultat estarà ordenat alfabèticament de menor a major pels cognoms i el nom.
--- SELECT persona.apellido1, persona.apellido2, persona.nombre, departamento.nombre AS 'departamento' FROM universidad.persona, univ`optica`ersidad.departamento ON WHERE persona.tipo LIKE 'profesor'
+SELECT persona.apellido1, persona.apellido2, persona.nombre, departamento.nombre AS 'departamento' FROM persona 
+INNER JOIN profesor ON persona.id = profesor.id_profesor
+INNER JOIN departamento ON profesor.id_departamento = departamento.id
+ORDER BY apellido1, nombre ASC;
 -- Retorna un llistat amb el nom de les assignatures, any d'inici i any de fi del curs escolar de l'alumne/a amb NIF 26902806M.
-SELECT asignatura.nombre, curso_escolar.anyo_inicio, curso_escolar.anyo_fin FROM asignatura, curso_escolar, persona, alumno_se_matricula_asignatura
-INNER JOIN universidad.persona ON asignatura.persona.nif = alumno_se_matricula_asignatura.id_alumno
+SELECT asignatura.nombre, curso_escolar.anyo_inicio, curso_escolar.anyo_fin FROM persona
+INNER JOIN alumno_se_matricula_asignatura ON alumno_se_matricula_asignatura = persona.id
 INNER JOIN asignatura ON asignatura.id = alumno_se_matricula_asignatura.id_asignatura
-INNER JOIN curso_escolar ON curso_escolar.id = alumno_se_matricula_asignatura.id_curso_escolar
-WHERE universidad.persona.nif LIKE '26902806M';
+INNER JOIN curso_escolar ON curso_escolar.id = asignatura.curso
+WHERE nif LIKE '26902806M';
 -- Retorna un llistat amb el nom de tots els departaments que tenen professors/es que imparteixen alguna assignatura en el Grau en Enginyeria Informàtica (Pla 2015).
+
 -- Retorna un llistat amb tots els alumnes que s'han matriculat en alguna assignatura durant el curs escolar 2018/2019.
+SELECT DISTINCT persona.nombre, persona.apellido1, persona.apellido2, id_curso_escolar FROM persona
+INNER JOIN alumno_se_matricula_asignatura on alumno_se_matricula_asignatura.id_alumno = persona.id
+INNER JOIN curso_escolar on curso_escolar.id = alumno_se_matricula_asignatura.id_curso_escolar
+WHERE curso_escolar.id = 5;
+
+-- Resol les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
+-- Retorna un llistat amb els noms de tots els professors/es i els departaments que tenen vinculats. El llistat també ha de mostrar aquells professors/es que no tenen cap departament associat. El llistat ha de retornar quatre columnes, nom del departament, primer cognom, segon cognom i nom del professor/a. El resultat estarà ordenat alfabèticament de menor a major pel nom del departament, cognoms i el nom.
+SELECT departamento.nombre, persona.apellido1, persona.apellido2, persona.nombre FROM persona 
+LEFT JOIN profesor ON profesor.id_profesor = persona.id 
+LEFT JOIN departamento ON departamento.id = profesor.id_departamento
+ORDER BY departamento.nombre, persona.apellido1, persona.apellido2, persona.nombre DESC;
+-- Retorna un llistat amb els professors/es que no estan associats a un departament.
+SELECT  persona.nombre, persona.apellido1, persona.apellido2 FROM persona
+LEFT JOIN profesor ON profesor.id_profesor = persona.id
+LEFT JOIN departamento ON departamento.id = profesor.id_departamento
+WHERE departamento.nombre IS NULL;
+-- Retorna un llistat amb els departaments que no tenen professors/es associats.
+SELECT departamento.nombre FROM departamento
+LEFT JOIN profesor ON profesor.id_departamento = departamento.id
+WHERE profesor.id_departamento IS NULL;
+-- Retorna un llistat amb els professors/es que no imparteixen cap assignatura.
+
+-- Retorna un llistat amb les assignatures que no tenen un professor/a assignat.
+
+-- Retorna un llistat amb tots els departaments que no han impartit assignatures en cap curs escolar.
 
